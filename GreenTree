@@ -1,0 +1,258 @@
+class GreenTreeGUI:
+    def __init__(self):
+        # 0 = Closed, 1 = Peeking, 2 = Fully Extended
+        self.zone_states = {
+            "top_left": 0, "top_right": 0,
+            "bot_left": 0, "bot_right": 0,
+            "search_box": "hidden"
+        }
+        self.radar_angle = 0 # Rotation state for leaderboard
+        
+    def trigger_corner_slide(self, zone):
+        """Logic for the 1x+++ slide-out window."""
+        self.zone_states[zone] = (self.zone_states[zone] + 1) % 3
+        status = ["Locked", "Peeking", "Expanded"][self.zone_states[zone]]
+        return f"[*] Zone {zone} status: {status}"
+
+    def hover_search(self, y_coord):
+        """Upper middle drop-down logic."""
+        if y_coord < 10: # Top 10% of screen
+            self.zone_states["search_box"] = "visible"
+            return "[SEARCH] Entering Information Delta..."
+        return None
+
+    def rotate_radar(self, velocity):
+        """Spinning menu for Leaderboard/Mind Map."""
+        self.radar_angle = (self.radar_angle + velocity) % 360
+        return f"[@] Radar oriented to {self.radar_angle}°"
+
+# --- Interface Simulation ---
+gui = GreenTreeGUI()
+
+
+<div id="ground-zero-ui">
+    
+    <div class="search-drop-zone">
+        <input type="text" placeholder="[Search Information Delta...]" id="search-bar">
+    </div>
+
+    <div class="corner-container top-right" id="radar-module">
+        <div class="radar-dial">
+            <div class="spinning-leaderboard"> </div>
+        </div>
+        <div class="global-chat-stream">
+            <p>[SYSTEM]: Handshake Verified...</p>
+        </div>
+    </div>
+
+    <div class="corner-container bot-left" id="econ-slider">
+        <div class="graph-display"> [3E: Economic Data] </div>
+    </div>
+
+    </div>
+
+
+:root {
+  --intensity-glow: 0px; /* Managed by JS 0-40 */
+  --theme-color: #00FF00; /* Default Ivory/Green */
+}
+
+/* 1x+++ Corner Logic */
+.corner-container {
+    position: absolute;
+    width: 50px; /* Minimized Form */
+    height: 50px;
+    background: #000; /* Obsidian Scroll base */
+    border: 1px solid var(--theme-color);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    box-shadow: 0 0 var(--intensity-glow) var(--theme-color);
+}
+
+/* Slide-out Expansion */
+.corner-container:hover {
+    width: 300px; /* The "+++" Expansion */
+    height: 400px;
+    z-index: 100;
+}
+
+/* Upper Middle Dropdown */
+.search-drop-zone {
+    position: absolute;
+    top: -50px; /* Hidden */
+    left: 50%;
+    transform: translateX(-50%);
+    transition: top 0.3s ease;
+}
+
+.search-drop-zone:hover {
+    top: 10px; /* Drop Down */
+}
+
+/* Radar Dial Spinning Animation */
+.radar-dial {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px dashed #00FFFF; /* Cyan */
+    animation: spin 10s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+
+function updateUIIntensity(value) {
+    const root = document.documentElement;
+    
+    // Calculate Glow (0-40 units map to 0-20px blur)
+    const glowSize = (value / 40) * 20;
+    root.style.setProperty('--intensity-glow', `${glowSize}px`);
+
+    // Dynamic Color Shift
+    if (value > 26) {
+        root.style.setProperty('--theme-color', '#FF0000'); // Red/High
+    } else if (value > 13) {
+        root.style.setProperty('--theme-color', '#FFFF00'); // Amber/Med
+    } else {
+        root.style.setProperty('--theme-color', '#00FF00'); // Green/Low
+    }
+}
+
+// Example: Ecology unit hits 35
+updateUIIntensity(35); 
+
+class GlobalChatEngine {
+    constructor(userWallet) {
+        this.userWallet = userWallet;
+        this.chatContainer = document.querySelector('.global-chat-stream');
+        this.verifiedVectors = new Set(); // Stores approved addresses
+    }
+
+    // Simulate receiving a message from the Network
+    receiveMessage(senderAddr, vectorName, text, intensity) {
+        if (!this.isValidAddress(senderAddr)) return; // Security Gate
+
+        const messageEl = document.createElement('div');
+        messageEl.className = 'chat-entry';
+        
+        // Apply Color Intensity (0-40) to the Vector Name
+        const color = intensity > 26 ? '#FF0000' : (intensity > 13 ? '#FFFF00' : '#00FF00');
+        
+        messageEl.innerHTML = `
+            <span class="vector-tag" style="color: ${color}">[${vectorName}]</span>
+            <span class="wallet-prefix">${senderAddr.substring(0, 6)}...</span>
+            <p class="message-body">${this.sanitize(text)}</p>
+        `;
+
+        this.chatContainer.appendChild(messageEl);
+        this.chatContainer.scrollTop = this.chatContainer.scrollHeight; // Auto-scroll
+    }
+
+    isValidAddress(addr) {
+        return addr.startsWith('0x') && addr.length === 42;
+    }
+
+    sanitize(str) {
+        return str.replace(/[<>]/g, ''); // Basic XSS protection
+    }
+}
+
+// --- Initialize with the Obsidian_Scroll_IV Profile ---
+const chat = new GlobalChatEngine("0x7A...F2");
+chat.receiveMessage("0x4B2...E9", "Panda_Orca", "Green Tree Handshake Verified at Ground Zero.", 12);
+chat.receiveMessage("0x9C1...A4", "Deus_Ex_V", "OVERCLOCK ALERT: Economic Delta Rising.", 38);
+.global-chat-stream {
+    height: 200px;
+    background: rgba(0, 0, 0, 0.85); /* Obsidian depth */
+    border-top: 1px solid #00FFFF; /* Cyan separator */
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    overflow-y: scroll;
+}
+
+.chat-entry {
+    margin-bottom: 8px;
+    border-left: 2px solid #555;
+    padding-left: 5px;
+}
+
+.vector-tag {
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.wallet-prefix {
+    color: #888;
+    font-size: 0.6rem;
+}
+
+
+import math
+
+class MindMapNode:
+    def __init__(self, address, vector_id, intensity):
+        self.address = address # ETH Wallet
+        self.vector_id = vector_id 
+        self.intensity = intensity # 0-40 Scale
+        # Coordinates based on Hash segments
+        self.x = int(address[2:6], 16) % 1000 
+        self.y = int(address[6:10], 16) % 1000
+        self.z = intensity 
+
+    def get_color(self):
+        """Maps 3E Intensity to Hex."""
+        if self.intensity > 26: return "#FF0000" # High
+        if self.intensity > 13: return "#FFFF00" # Med
+        return "#00FF00" # Low
+
+class MindMapLink:
+    def __init__(self, source, target):
+        self.source = source # MindMapNode
+        self.target = target # MindMapNode
+        # Integrity = Distance Inverse
+        self.integrity = 1 / math.sqrt((source.x - target.x)**2 + (source.y - target.y)**2)
+class MindMapEngine {
+    constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.nodes = [];
+    }
+
+    addNode(wallet, intensity) {
+        const newNode = {
+            id: wallet,
+            x: Math.random() * this.canvas.width,
+            y: Math.random() * this.canvas.height,
+            intensity: intensity,
+            color: intensity > 26 ? '#FF0000' : '#00FF00'
+        };
+        this.nodes.push(newNode);
+        this.triggerRadarPing(); // Link to the UI pulse we built
+    }
+
+    drawLinks() {
+        this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)'; // Cyan Link
+        this.nodes.forEach((node, i) => {
+            if (i > 0) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.nodes[0].x, this.nodes[0].y); // Anchor to You
+                this.ctx.lineTo(node.x, node.y);
+                this.ctx.stroke();
+            }
+        });
+    }
+
+    triggerRadarPing() {
+        // Visual Ripple on the Radar Dial
+        console.log("[RADAR] New Node Detected. Syncing coordinates...");
+    }
+}
+
+```
+``
+```
